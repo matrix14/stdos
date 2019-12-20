@@ -1,16 +1,21 @@
 package stdos.Filesystem;
-import java.util.Arrays;
+import stdos.Semaphore.JPmetody;
+
 import java.util.Vector;
 
 public class Pliki extends Plik{
 
-    private Vector<Plik> Files = new Vector<>();
-
+    public static Vector<Plik> Files = new Vector<>();
+    public static Vector<Plik> Open = new Vector<>();
     public Pliki(String nazwa) {
         super(nazwa);
     }
 
-    public boolean czyPjest(String nazwa) {
+    public Pliki() {
+
+    }
+
+    public static boolean czyPjest(String nazwa) {
         for (Plik e : Files) {
             if (e.Nazwa().equals(nazwa)) {
                 return true;
@@ -19,36 +24,84 @@ public class Pliki extends Plik{
         return false;
     }
 
+    public static boolean czyPotw(String nazwa) {
+        for (Plik e : Open) {
+            if (e.Nazwa().equals(nazwa)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
+    public static Plik KP_dlaJP(String nazwa) {
+        for (Plik e : Files) {
+            if (e.Nazwa().equals(nazwa)) {
+                return e;
+            }
+        }
+        return null;
+    }
 
-    public void KP_utwP(String nazwa, byte[] content) {
+    public void KP_utwP(String nazwa) {
         if (czyPjest(nazwa)) {
-            //Interfejs.println("Plik " + nazwa + " już istnieje");
+            System.out.println("Plik " + nazwa + " już istnieje");
             return;
         }
         if (nazwa.equals("")) {
-            //Interfejs.println("Podaj nazwe pliku");
+            System.out.println("Podaj nazwe pliku");
             return;
         }
         Plik newP = new Plik(nazwa);
-        newP.setIndexBlock(Dysk.addContent(content, 10));
+        byte[]content={};
+        newP.setIndexBlock(Dysk.addContent(content, indeks));
         newP.UstRozm(content.length);
         Files.add(newP);
+    }
+
+    public void KP_dopP(String nazwa, byte[] content) {
+        if (czyPjest(nazwa)) {
+            for (Plik e : Files) {
+                if (e.Nazwa().equals(nazwa)) {
+                    if (czyPotw(nazwa)) {
+                        e.setIndexBlock(Dysk.addContent(content, indeks));
+                        e.UstRozm(content.length);
+                        return;
+
+                    }
+                   else{
+                       System.out.println("Plik " + nazwa + " nie jest otwarty");
+                        return;
+                    }
+                }
+            }
+        }
+        if (nazwa.equals("")) {
+            System.out.println("Podaj nazwe pliku");
+            return;
+        }
     }
 
     public byte[] KP_pobP(String nazwa) {
         for (Plik e : Files) {
             if (e.Nazwa().equals(nazwa)) {
-                return Dysk.getBlockByIndex(e.getIndexBlock());
+                if (czyPotw(nazwa)) {
+                    byte[] a =Dysk.getBlockByIndex(e.getIndexBlock());
+                    return a;
+                }
+                else{
+                    System.out.println("Plik " + nazwa + " nie jest otwarty");
+                    return null;
+                }
             }
         }
-        //Interfejs.println("Nie ma takiego pliku");
+        System.out.println("Nie ma takiego pliku");
         return Dysk.invalid();
     }
 
+
     public void KP_pokP(){
         for(Plik e: Files){
-            //Interfejs.println("\t" + e.getSize() + "\t" + e.getName() );
+            System.out.println("\t" + e.Rozm()+ "\t" + e.Nazwa() );
         }
     }
 
@@ -56,12 +109,36 @@ public class Pliki extends Plik{
     public void KP_usunP(String nazwa){
         for (Plik e : Files){
             if (e.Nazwa().equals(nazwa)){
-                Dysk.remove(e.getIndexBlock());
-                Files.remove(e);
-                return;
+                //if (czyPotw(nazwa)) {
+                    Dysk.remove(e.getIndexBlock());
+                    Files.remove(e);
+                    return;
+
+               // }
+                //else{
+                    //System.out.println("Plik " + nazwa + " nie jest otwarty");
+                    //return;
+               // }
+
             }
         }
-        //Interfejs.println("Brak pliku o nazwie: " + nazwa);
+        System.out.println("Brak pliku o nazwie: " + nazwa);
     }
+    public void KP_otwP(String nazwa) {
+        for (Plik p : Files) {
+            if (p.Nazwa().equals(nazwa)) {
+                JPmetody.wait(p.sem);
+                Open.add(p);
+            }
+        }
+    }
+    public void KP_zamkP(String nazwa) {
+        for (Plik p : Files) {
+            if (p.Nazwa().equals(nazwa)) {
+                JPmetody.signal(p.sem);
+                Open.remove(p);
+            }
+        }
 
+    }
 }

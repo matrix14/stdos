@@ -12,7 +12,7 @@ public abstract class Dysk {
     static final byte EMPTY_CELL = -3;
     static final byte INDEX_CELL = -2; //marks beginning of an index block
 
-    private static byte physicalDisk[] = new byte[1024];
+    private static byte physicalDisk[] = new byte[4096];
     private static boolean blockTaken[] = new boolean[physicalDisk.length / BLOCK_SIZE];
     private static int blockAmount = blockTaken.length;
     private static int currentBlock = 0;
@@ -33,23 +33,10 @@ public abstract class Dysk {
         return new byte[]{INDEX_CELL};
     }
 
-
-    /**
-     * Gets the value of specified block
-     *
-     * @param index block to be returned
-     * @return byte[] corresponding to specified block
-     */
     public static byte[] getBlock(int index) {
         return Arrays.copyOfRange(physicalDisk, index * BLOCK_SIZE, index * BLOCK_SIZE + BLOCK_SIZE);
     }
 
-    /***
-     * Gets all blocks assigned to an index block
-     *
-     * @param index     which index block to get content from
-     * @return byte[] of all data blocks
-     */
     public static byte[] getBlockByIndex(int index) {
         byte[] indexBlock = getBlock(index);
         int blockAmount = 0;
@@ -70,13 +57,6 @@ public abstract class Dysk {
         return result;
     }
 
-
-    /**
-     * Inserts data into a block. Does not divide data, does not check for empty block.
-     *
-     * @param index   which block to insert into
-     * @param content content ot be inserted, no longer than {@value BLOCK_SIZE}
-     */
     static void setBlock(int index, byte[] content) {
         int max = content.length < BLOCK_SIZE ? BLOCK_SIZE : content.length;
         blockTaken[index] = true;
@@ -94,12 +74,6 @@ public abstract class Dysk {
         return blockTaken[index];
     }
 
-    /**
-     * Finds free block on disk, checking whole disk
-     *
-     * @param index from which index to start looking
-     * @return next free index
-     */
     static int findNextFree(int index) {
         for (int i = index; i < blockAmount; i++) {
             if (!isTaken(i)) {
@@ -121,13 +95,6 @@ public abstract class Dysk {
         return Arrays.copyOfRange(content, 0, BLOCK_SIZE);
     }
 
-    /**
-     * Writes data onto disk searching for free space, dividing as needed.
-     *
-     * @param content content to be written
-     * @param index   from which index to start searching
-     * @return number of the assigned index block`
-     */
     public static int addContent(byte[] content, int index) {
         int currentIndex = findNextFree(index);
         int x = 0;
@@ -162,11 +129,7 @@ public abstract class Dysk {
         }
     }
 
-
-    /***
-     * Shows disk content in a formatted table
-     */
-    private static void show() {
+    public static void show() {
         System.out.print("     ");
         for (int i = 0; i <= BLOCK_SIZE / 10; i++) {
             System.out.print(i + "                             ");
@@ -217,48 +180,4 @@ public abstract class Dysk {
         return true;
     }
 
-    public static void test(ArrayList<String> args) {
-
-        String help = "DISK - tests if disk is working";
-        if (args.size() != 1 && args.size() != 2 && args.size() != 3) {
-           // Utils.log("Wrong numbers of arguments");
-          //  Shell.println(help);
-        } else {
-            if (args.size() == 1) {
-                try {
-                    run();
-                } catch (IndexOutOfBoundsException e) {
-                    //Utils.step("Disk out of bounds");
-                }
-            } else {
-                String param = args.get(1);
-                switch (param.toUpperCase()) {
-                    case "CLEAR":
-                        physicalDisk = new byte[1024];
-                        blockTaken = new boolean[physicalDisk.length / BLOCK_SIZE];
-                        break;
-                    case "SHOW":
-                        show();
-                        break;
-                    case "INSERT":
-                        currentBlock = parseInt(args.get(2));
-                        break;
-                    case "NEWLINE":
-                        addContent("Testowy string\n w nowej lini :)\n z\ttabem".getBytes(), 10);
-                        break;
-                    case "GET":
-                        byte[] temp;
-                        temp = getBlockByIndex(Integer.parseInt(args.get(2)));
-                        for (byte e : temp) {
-                            System.out.print((char) e);
-                        }
-                        break;
-                    default:
-                      //  Utils.log("Wrong argument");
-                       // Shell.println(help);
-                        break;
-                }
-            }
-        }
-    }
 }

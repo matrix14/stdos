@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Stack;
 
 class Node{
-    private static int minimal_size = 4;
+    private static int minimal_size = 2;
 
     private boolean reserved = false;
     private boolean divided = false;
@@ -134,7 +134,7 @@ class BinaryTree {
 }
 
 public class RAMModule {
-    static final int RAM_SIZE = 128;
+    static final int RAM_SIZE = 256;
     static byte[] RAM;
     static BinaryTree binary_tree;
 
@@ -176,7 +176,7 @@ public class RAMModule {
         return RAM[adres];
     }
     public static byte odczytaj_bajt(int adres_logiczny, int adres_fizyczny) { return RAM[adres_logiczny + adres_fizyczny]; }
-    public byte[] odczytaj_bajty(int adres, int rozmiar){
+    public static byte[] odczytaj_bajty(int adres, int rozmiar){
         byte ret[] = new byte[rozmiar];
 
         for(int i = 0; i < rozmiar; ++i){
@@ -203,6 +203,16 @@ public class RAMModule {
             }
             System.out.println();
         }
+    }
+
+    public static void wypisz_pamiec_char(){
+        for(int x = 0; x <RAM_SIZE; x += 16){
+            for(int i = 0; i < 16; ++i){
+                System.out.print((char)RAM[i + x]);
+            }
+            System.out.println();
+        }
+
     }
 
     /* wypisuje podział */

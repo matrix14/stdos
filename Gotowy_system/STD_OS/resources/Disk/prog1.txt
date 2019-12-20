@@ -1,0 +1,19 @@
+MO AX 2 
+MO BX 1 
+MO CX 10 
+DE CX 
+CF plik1 
+AD AX BX 
+DE CX 
+JZ [120] 
+AD BX AX 
+DE CX 
+JN [40] 
+OF plik1 
+AF plik1 BX 
+FC plik1 
+SP 
+OF plik1 
+AF plik1 AX 
+FC plik1 
+SP 

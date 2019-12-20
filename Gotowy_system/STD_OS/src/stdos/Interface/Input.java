@@ -1,18 +1,24 @@
 package stdos.Interface;
-
 import java.util.Scanner;
 
 class Input{
-    private static Scanner inputScanner= new Scanner(System.in);
-    static void start() throws UnsupportedOperationException {
+    public static void startInterface() throws UnsupportedOperationException {
+        Help.printLogo();
+
+        Scanner inputScanner = new Scanner(System.in);
             while (!SwitchInput.exitFlag) {
+                System.out.print(">>");
                 String input = inputScanner.nextLine();
+
                 try {
                     SwitchInput.inputSwitch(input);
-                } catch (Exception e) {
-                    System.out.println("[Shell]: Blad");
+               } catch (Exception e) {
+                    Sound.errorSound();
+                   System.out.println("[Shell]: Blad modulu" + e.getMessage());
                 }
             }
-        }
 
-}
+    }
+    }
+
+

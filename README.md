@@ -4,12 +4,12 @@
 <h2>OS created during studies</h2>
 
 <ul>System contains 8 modules: 
-<li>
+<li>Semaphore
 <li>Process Manager - Windows
-<li>
-<li>
-<li>
-<li>
-<li>
+<li>CPU Scheduler - Windows-based priority algorithm
+<li>File System - Index Access Method
+<li>RAM - buddy system
+<li>Virtual Memory - Segmentation
+<li>Assembler, Interpreter and two testing programs
 <li>Text Interface
 </ul>
